@@ -24,7 +24,7 @@
   --r:18px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;overflow-x:hidden;overscroll-behavior-x:none;width:100%}
 body{
   background:
     radial-gradient(1200px 700px at 70% -10%, #7A0A0D 0%, transparent 60%),
@@ -164,17 +164,18 @@ section{padding:46px 0}
 .aba:hover{color:var(--ouro)}
 .aba[aria-selected="true"]{background:linear-gradient(175deg,#FFE07A,var(--ouro) 60%,#D08F04);color:#3A0405;border-color:transparent}
 
-.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:15px}
+.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px;max-width:100%}
 .item{
   display:flex;gap:14px;align-items:flex-start;justify-content:space-between;
   padding:19px;border-radius:var(--r);border:1px solid rgba(249,182,7,.16);
   background:linear-gradient(160deg,rgba(166,16,18,.42),rgba(45,3,4,.6));
   transition:border-color .2s, transform .2s;
+  min-width:0;max-width:100%;
 }
 .item:hover{border-color:rgba(249,182,7,.45);transform:translateY(-2px)}
 .item.ativo{border-color:var(--ouro);box-shadow:0 0 0 1px rgba(249,182,7,.3)}
 .item .txt{flex:1;min-width:0}
-.item h4{font-family:var(--corpo);font-weight:600;font-size:1.01rem;letter-spacing:0;line-height:1.25}
+.item h4{font-family:var(--corpo);font-weight:600;font-size:1.01rem;letter-spacing:0;line-height:1.25;overflow-wrap:anywhere}
 .item p{font-size:.82rem;color:rgba(255,243,222,.62);margin-top:5px}
 .preco{font-family:var(--display);font-weight:900;font-size:1.32rem;margin-top:9px;color:var(--ouro);letter-spacing:-.02em}
 .preco small{font-family:var(--corpo);font-size:.68rem;font-weight:700;opacity:.7;margin-right:3px;letter-spacing:.04em}
@@ -528,8 +529,12 @@ function montarGrade(){
 function abrirAba(id){
   abaAtual = id;
   montarAbas(); montarGrade();
-  const ativa = document.querySelector('.aba[aria-selected="true"]');
-  if(ativa) ativa.scrollIntoView({behavior:"smooth", block:"nearest", inline:"center"});
+  const abas = document.getElementById("abas");
+  const ativa = abas.querySelector('.aba[aria-selected="true"]');
+  if(ativa){
+    const alvo = ativa.offsetLeft - (abas.clientWidth - ativa.clientWidth) / 2;
+    abas.scrollTo({ left: Math.max(0, alvo), behavior: "smooth" });
+  }
 }
 
 function mudar(k,delta){
@@ -583,7 +588,7 @@ function enviar(){
   window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(m)}`, "_blank");
 }
 
-function irPara(sel){ document.querySelector(sel).scrollIntoView({behavior:"smooth", block:"start"}); }
+function irPara(sel){ document.querySelector(sel).scrollIntoView({behavior:"smooth", block:"start", inline:"nearest"}); }
 
 /* faixa dourada infinita */
 const pista = document.querySelector(".faixa .pista");
@@ -594,6 +599,12 @@ const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting
 document.querySelectorAll(".reveal").forEach(el => obs.observe(el));
 
 montarAbas(); montarGrade(); atualizar();
+
+/* trava de segurança: nunca deixa a página inteira rolar para os lados,
+   não importa o que tenha causado a tentativa de rolagem */
+window.addEventListener("scroll", () => {
+  if (window.scrollX !== 0) window.scrollTo({ left: 0, top: window.scrollY, behavior: "instant" });
+}, { passive: true });
 </script>
 </body>
 </html>
