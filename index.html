@@ -264,6 +264,14 @@ footer p .marca{white-space:nowrap}
 }
 .campo input::placeholder,.campo textarea::placeholder{color:rgba(255,243,222,.32)}
 .campo input:focus,.campo textarea:focus{border-color:var(--ouro);outline:none}
+.campo select{
+  width:100%;padding:13px 15px;border-radius:12px;font:inherit;font-size:.95rem;
+  background:rgba(0,0,0,.3) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="9" viewBox="0 0 14 9"><path d="M1 1l6 6 6-6" stroke="%23F9B607" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>') no-repeat right 15px center;
+  border:1px solid var(--linha);color:var(--creme);appearance:none;-webkit-appearance:none;
+  cursor:pointer;
+}
+.campo select:focus{border-color:var(--ouro);outline:none}
+.campo select option{background:#2B0304;color:var(--creme)}
 .opcoes{display:flex;gap:8px;flex-wrap:wrap}
 .opcoes input{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
 .opcoes .pill{cursor:pointer;padding:10px 16px;border-radius:999px;border:1px solid var(--linha);background:rgba(0,0,0,.3);color:var(--creme);font-size:.88rem;font-weight:700;transition:.15s;user-select:none}
@@ -449,12 +457,13 @@ footer p .marca{white-space:nowrap}
     <div class="campo"><label for="end">Endereço para entrega</label><input id="end" placeholder="Rua, número, bairro"></div>
     <div class="campo"><label for="ref">Ponto de referência</label><input id="ref" placeholder="Perto de..."></div>
     <div class="campo">
-      <label>Forma de pagamento</label>
-      <div class="opcoes">
-        <input type="radio" name="pagamento" id="pg-dinheiro" value="Dinheiro" onchange="atualizarPagamento()"><label class="pill" for="pg-dinheiro">Dinheiro</label>
-        <input type="radio" name="pagamento" id="pg-cartao" value="Cartão" onchange="atualizarPagamento()"><label class="pill" for="pg-cartao">Cartão</label>
-        <input type="radio" name="pagamento" id="pg-pix" value="Pix" onchange="atualizarPagamento()"><label class="pill" for="pg-pix">Pix</label>
-      </div>
+      <label for="pagamento">Forma de pagamento</label>
+      <select id="pagamento" onchange="atualizarPagamento()">
+        <option value="" selected>Selecione...</option>
+        <option value="Pix">Pix</option>
+        <option value="Cartão na entrega">Cartão na entrega</option>
+        <option value="Dinheiro">Dinheiro</option>
+      </select>
     </div>
     <div class="campo" id="campoTroco" style="display:none">
       <label>Precisa de troco?</label>
@@ -599,8 +608,7 @@ function fecharModal(){
   document.body.style.overflow = "";
 }
 function atualizarPagamento(){
-  const pg = document.querySelector('input[name="pagamento"]:checked');
-  const ehDinheiro = pg && pg.value === "Dinheiro";
+  const ehDinheiro = document.getElementById("pagamento").value === "Dinheiro";
   document.getElementById("campoTroco").style.display = ehDinheiro ? "block" : "none";
   if(!ehDinheiro){
     document.querySelectorAll('input[name="troco"]').forEach(r => r.checked = false);
@@ -624,9 +632,9 @@ function enviar(){
   m += `\nMeu Nome: ${v("nome")}\n`;
   m += `Meu endereço para entrega: ${v("end")}\n`;
   m += `Ponto de Referência: ${v("ref")}\n`;
-  const pg = document.querySelector('input[name="pagamento"]:checked');
-  m += `Forma de pagamento: ${pg ? pg.value : "Não informado"}\n`;
-  if(pg && pg.value === "Dinheiro"){
+  const formaPagamento = v("pagamento");
+  m += `Forma de pagamento: ${formaPagamento || "Não informado"}\n`;
+  if(formaPagamento === "Dinheiro"){
     const tr = document.querySelector('input[name="troco"]:checked');
     if(tr && tr.value === "sim"){
       m += `Precisa de troco para: ${v("trocoValor") || "(valor não informado)"}\n`;
