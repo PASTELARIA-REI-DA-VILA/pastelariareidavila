@@ -264,6 +264,11 @@ footer p .marca{white-space:nowrap}
 }
 .campo input::placeholder,.campo textarea::placeholder{color:rgba(255,243,222,.32)}
 .campo input:focus,.campo textarea:focus{border-color:var(--ouro);outline:none}
+.opcoes{display:flex;gap:8px;flex-wrap:wrap}
+.opcoes input{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
+.opcoes .pill{cursor:pointer;padding:10px 16px;border-radius:999px;border:1px solid var(--linha);background:rgba(0,0,0,.3);color:var(--creme);font-size:.88rem;font-weight:700;transition:.15s;user-select:none}
+.opcoes input:checked + .pill{background:var(--ouro);color:#2B0304;border-color:var(--ouro)}
+.opcoes input:focus-visible + .pill{outline:2px solid var(--ouro);outline-offset:2px}
 .folha .btn{width:100%;margin-top:8px}
 .vazio{text-align:center;color:rgba(255,243,222,.6);padding:24px 0;font-size:.95rem}
 
@@ -443,6 +448,25 @@ footer p .marca{white-space:nowrap}
     <div class="campo"><label for="nome">Seu nome</label><input id="nome" placeholder="Como devemos te chamar"></div>
     <div class="campo"><label for="end">Endereço para entrega</label><input id="end" placeholder="Rua, número, bairro"></div>
     <div class="campo"><label for="ref">Ponto de referência</label><input id="ref" placeholder="Perto de..."></div>
+    <div class="campo">
+      <label>Forma de pagamento</label>
+      <div class="opcoes">
+        <input type="radio" name="pagamento" id="pg-dinheiro" value="Dinheiro" onchange="atualizarPagamento()"><label class="pill" for="pg-dinheiro">Dinheiro</label>
+        <input type="radio" name="pagamento" id="pg-cartao" value="Cartão" onchange="atualizarPagamento()"><label class="pill" for="pg-cartao">Cartão</label>
+        <input type="radio" name="pagamento" id="pg-pix" value="Pix" onchange="atualizarPagamento()"><label class="pill" for="pg-pix">Pix</label>
+      </div>
+    </div>
+    <div class="campo" id="campoTroco" style="display:none">
+      <label>Precisa de troco?</label>
+      <div class="opcoes">
+        <input type="radio" name="troco" id="tr-sim" value="sim" onchange="atualizarPagamento()"><label class="pill" for="tr-sim">Sim</label>
+        <input type="radio" name="troco" id="tr-nao" value="nao" onchange="atualizarPagamento()"><label class="pill" for="tr-nao">Não</label>
+      </div>
+    </div>
+    <div class="campo" id="campoTrocoValor" style="display:none">
+      <label for="trocoValor">Troco para quanto?</label>
+      <input id="trocoValor" placeholder="Ex.: R$ 100">
+    </div>
     <div class="campo"><label for="obs">Observações (opcional)</label><textarea id="obs" rows="2" placeholder="Ex.: sem cebola, vinagrete extra"></textarea></div>
     <button class="btn btn-ouro" onclick="enviar()">Enviar pedido no WhatsApp</button>
   </div>
@@ -574,6 +598,19 @@ function fecharModal(){
   document.getElementById("modal").classList.remove("on");
   document.body.style.overflow = "";
 }
+function atualizarPagamento(){
+  const pg = document.querySelector('input[name="pagamento"]:checked');
+  const ehDinheiro = pg && pg.value === "Dinheiro";
+  document.getElementById("campoTroco").style.display = ehDinheiro ? "block" : "none";
+  if(!ehDinheiro){
+    document.querySelectorAll('input[name="troco"]').forEach(r => r.checked = false);
+    document.getElementById("campoTrocoValor").style.display = "none";
+    document.getElementById("trocoValor").value = "";
+    return;
+  }
+  const tr = document.querySelector('input[name="troco"]:checked');
+  document.getElementById("campoTrocoValor").style.display = (tr && tr.value === "sim") ? "block" : "none";
+}
 document.addEventListener("keydown", e => { if(e.key === "Escape") fecharModal(); });
 
 function enviar(){
@@ -587,6 +624,16 @@ function enviar(){
   m += `\nMeu Nome: ${v("nome")}\n`;
   m += `Meu endereço para entrega: ${v("end")}\n`;
   m += `Ponto de Referência: ${v("ref")}\n`;
+  const pg = document.querySelector('input[name="pagamento"]:checked');
+  m += `Forma de pagamento: ${pg ? pg.value : "Não informado"}\n`;
+  if(pg && pg.value === "Dinheiro"){
+    const tr = document.querySelector('input[name="troco"]:checked');
+    if(tr && tr.value === "sim"){
+      m += `Precisa de troco para: ${v("trocoValor") || "(valor não informado)"}\n`;
+    } else if(tr && tr.value === "nao"){
+      m += `Não precisa de troco\n`;
+    }
+  }
   window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(m)}`, "_blank");
 }
 
