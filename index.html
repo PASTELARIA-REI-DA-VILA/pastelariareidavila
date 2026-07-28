@@ -24,7 +24,7 @@
   --r:18px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;overflow-x:hidden;width:100%}
+html{scroll-behavior:smooth}
 body{
   background:
     radial-gradient(1200px 700px at 70% -10%, #7A0A0D 0%, transparent 60%),
@@ -164,18 +164,17 @@ section{padding:46px 0}
 .aba:hover{color:var(--ouro)}
 .aba[aria-selected="true"]{background:linear-gradient(175deg,#FFE07A,var(--ouro) 60%,#D08F04);color:#3A0405;border-color:transparent}
 
-.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(310px,100%),1fr));gap:15px}
+.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:15px}
 .item{
   display:flex;gap:14px;align-items:flex-start;justify-content:space-between;
   padding:19px;border-radius:var(--r);border:1px solid rgba(249,182,7,.16);
   background:linear-gradient(160deg,rgba(166,16,18,.42),rgba(45,3,4,.6));
   transition:border-color .2s, transform .2s;
-  min-width:0;max-width:100%;
 }
 .item:hover{border-color:rgba(249,182,7,.45);transform:translateY(-2px)}
 .item.ativo{border-color:var(--ouro);box-shadow:0 0 0 1px rgba(249,182,7,.3)}
 .item .txt{flex:1;min-width:0}
-.item h4{font-family:var(--corpo);font-weight:600;font-size:1.01rem;letter-spacing:0;line-height:1.25;overflow-wrap:anywhere}
+.item h4{font-family:var(--corpo);font-weight:600;font-size:1.01rem;letter-spacing:0;line-height:1.25}
 .item p{font-size:.82rem;color:rgba(255,243,222,.62);margin-top:5px}
 .preco{font-family:var(--display);font-weight:900;font-size:1.32rem;margin-top:9px;color:var(--ouro);letter-spacing:-.02em}
 .preco small{font-family:var(--corpo);font-size:.68rem;font-weight:700;opacity:.7;margin-right:3px;letter-spacing:.04em}
